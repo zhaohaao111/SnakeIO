@@ -101,7 +101,7 @@ public class SnakeServer {
 							break;
 						case MsgType.EAT_FOOD:
 							int index = json.getIntValue("index");
-							serverListener.eatFood(index, foodManager, snake);
+							serverListener.eatFood(index, foodManager, snakesMap, port);
 							serverListener.updateFoods(clientsOut, foodManager);
 							break;
 					}

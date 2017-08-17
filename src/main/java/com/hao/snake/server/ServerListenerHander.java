@@ -18,34 +18,41 @@ import com.hao.snake.listener.ServerListener;
 
 public class ServerListenerHander implements ServerListener{
 	
-	private JSONObject result = new JSONObject();
 
 	@Override
 	public void playJoin(ConcurrentHashMap<Integer, Snake> snakesMap, PrintWriter out, FoodManager foodManager, Skin skin, int port) {
+		JSONObject result = new JSONObject();
 		System.out.println(port);
 		Snake snake = new Snake();
 		snake.setSkin(skin);
 		snakesMap.put(port, snake);
-		synchronized (snakesMap) {
-			String snakesStr = JSONObject.toJSONString(snakesMap);
-			result.put("type", MsgType.INIT );
-			result.put("snakes", snakesStr);
-			result.put("foodManager", foodManager);
-			out.println(result.toJSONString());
-		}
+		ConcurrentHashMap<Integer, Snake> temp = new ConcurrentHashMap<Integer, Snake>();
+		temp.putAll(snakesMap);
+		String snakesStr = JSONObject.toJSONString(temp);
+		result.put("type", MsgType.INIT );
+		result.put("snakes", snakesStr);
+		result.put("foodManager", foodManager);
+		out.println(result.toJSONString());
 		out.flush();
 		result.clear();
+		result = null;
+		temp.clear();
+		temp = null;
 	}
 
 	@Override
 	public void getSnake(ConcurrentHashMap<Integer, Snake> snakesMap, PrintWriter out) {
-		synchronized (snakesMap) {
-			result.put("type", MsgType.GET_SNAKE);
-			result.put("snakes", JSONObject.toJSONString(snakesMap));
-			out.println(result.toJSONString());
-		}
+		JSONObject result = new JSONObject();
+		ConcurrentHashMap<Integer, Snake> temp = new ConcurrentHashMap<Integer, Snake>();
+		temp.putAll(snakesMap);
+		result.put("type", MsgType.GET_SNAKE);
+		result.put("snakes", JSONObject.toJSONString(temp));
+		out.println(result.toJSONString());
 		out.flush();
 		result.clear();
+		result = null;
+		temp.clear();
+		temp = null;
 	}
 
 	@Override
@@ -58,19 +65,20 @@ public class ServerListenerHander implements ServerListener{
 	}
 
 	@Override
-	public void eatFood(int index, FoodManager foodManager, Snake snake) {
+	public void eatFood(int index, FoodManager foodManager, ConcurrentHashMap<Integer, Snake> snakesMap, int port) {
 		try {
+			Snake snake = snakesMap.get(port);
 			List<Food> foods = foodManager.getFoods();
 			Food food = foods.get(index);
 			LinkedList<Node> body = snake.getBody();
 			Node head = body.peekFirst();
 			Node tail = body.peekLast();
 			int foodSize = food.getSize()/2;
-			while(foodSize>0){
-				synchronized (body) {
+			synchronized (snakesMap) {
+				while(foodSize>0){
 					body.addLast(new Node(head.getX(),head.getY(),tail.getAngle()));
+					foodSize--;
 				}
-				foodSize--;
 			}
 			foods.remove(index);
 			foodManager.createFood(snake);
@@ -82,6 +90,7 @@ public class ServerListenerHander implements ServerListener{
 
 	@Override
 	public void updateFoods(ConcurrentHashMap<Integer, PrintWriter> outPutMap, FoodManager foodManager) {
+		JSONObject result = new JSONObject();
 		result = new JSONObject();
 		result.put("type", MsgType.UPDATE_FOOD);
 		result.put("foodManager", JSONObject.toJSONString(foodManager));
@@ -91,6 +100,7 @@ public class ServerListenerHander implements ServerListener{
 			writer.flush();
 		}
 		result.clear();
+		result = null;
 	}
 
 	@Override
