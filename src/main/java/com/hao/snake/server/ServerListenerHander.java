@@ -43,16 +43,12 @@ public class ServerListenerHander implements ServerListener{
 	@Override
 	public void getSnake(ConcurrentHashMap<Integer, Snake> snakesMap, PrintWriter out) {
 		JSONObject result = new JSONObject();
-		ConcurrentHashMap<Integer, Snake> temp = new ConcurrentHashMap<Integer, Snake>();
-		temp.putAll(snakesMap);
 		result.put("type", MsgType.GET_SNAKE);
-		result.put("snakes", JSONObject.toJSONString(temp));
+		result.put("snakes", JSONObject.toJSONString(snakesMap));
 		out.println(result.toJSONString());
 		out.flush();
 		result.clear();
 		result = null;
-		temp.clear();
-		temp = null;
 	}
 
 	@Override
