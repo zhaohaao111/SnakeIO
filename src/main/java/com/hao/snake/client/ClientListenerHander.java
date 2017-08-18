@@ -40,7 +40,8 @@ public class ClientListenerHander implements ClientListener {
 	@Override
 	public void beforePaint(PrintWriter out) {
 		JSONObject result = new JSONObject();
-		result.put("type", MsgType.GET_SNAKE);
+//		result.put("type", MsgType.GET_SNAKE);
+		result.put("type", MsgType.GET_HEADS);
 		out.println(result.toJSONString());
 		out.flush();
 		result.clear();

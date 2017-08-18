@@ -7,11 +7,13 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.hao.snake.FoodManager;
+import com.hao.snake.Node;
 import com.hao.snake.Skin;
 import com.hao.snake.Snake;
 import com.hao.snake.common.MsgType;
@@ -64,6 +66,10 @@ public class SnakeClient {
 		            				foodManager = JSONObject.parseObject(json.getString("foodManager"), FoodManager.class);
 		            				app.setFoodManager(foodManager);
 		            				break;
+		            			case MsgType.GET_HEADS:
+		            				ConcurrentHashMap<Integer, Node> heads = JSONObject.parseObject(json.getString("heads"), new TypeReference<ConcurrentHashMap<Integer, Node>>(){});
+		            				updateSnakes(heads);
+		            				break;
 		            		}
 						}
 						catch (IOException e) {
@@ -71,6 +77,7 @@ public class SnakeClient {
 						}
 					}
 				}
+
 			});
 			t.start();
 		}
@@ -81,6 +88,25 @@ public class SnakeClient {
 			e.printStackTrace();
 		}
     }
+    
+
+	private void updateSnakes(ConcurrentHashMap<Integer, Node> heads) {
+		ConcurrentHashMap<Integer, Snake> snakes = app.getSnakes();
+		for (Entry<Integer, Snake> entry : snakes.entrySet()) {
+			Snake snake = entry.getValue();
+			int port = entry.getKey();
+			Node head = heads.get(port);
+			if(head == null){
+				snakes.remove(port);
+				continue;
+			}
+			Node snakeHead = snake.getBody().peekFirst();
+			snakeHead.setAngle(head.getAngle());
+			snake.move(3);
+			snakeHead.copy(head);
+			head = null;
+		}
+	}
     
     public static void main(String[] args) throws Exception {
     	SnakeClient client = new SnakeClient(Skin.SKIN_2, new ClientListenerHander());

@@ -17,6 +17,8 @@ public interface ServerListener {
 	
 	void updateSnake(Node head, Snake snake);
 	
+	void getHead(ConcurrentHashMap<Integer, Snake> snakesMap, PrintWriter out);
+	
 	void eatFood(int index, FoodManager foodManager, ConcurrentHashMap<Integer, Snake> snakesMap, int port);
 	
 	void updateFoods(ConcurrentHashMap<Integer, PrintWriter> outPutMap, FoodManager foodManager);

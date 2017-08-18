@@ -118,7 +118,7 @@ public class ClientApp extends JPanel implements MouseMotionListener, Runnable{
 			mouseX = null;
 			mouseY = null;
 		}
-		snake.move(3);
+//		snake.move(3);
 		int index = snake.eat(foodManager);
 		if(index != -1){
 			clientListener.eatFood(index, out);

@@ -73,6 +73,8 @@ public class SnakeServer {
 			new Thread(this).start();
 		}
 		
+		int times = 0;
+		
 		public void run() {
 			try {
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -97,12 +99,22 @@ public class SnakeServer {
 						case MsgType.UPDATE_SNAKE:
 							Node temp = JSONObject.parseObject(json.getString("head"), Node.class);
 							serverListener.updateSnake(temp, snake);
-							snakesMap.put(port, snake);
+							break;
+						case MsgType.GET_HEADS:
+							times++;
+							if(times>=30){
+								serverListener.getSnake(snakesMap, out);
+								times = 0;
+								break;
+							}
+							serverListener.getHead(snakesMap, out);
 							break;
 						case MsgType.EAT_FOOD:
 							int index = json.getIntValue("index");
 							serverListener.eatFood(index, foodManager, snakesMap, port);
 							serverListener.updateFoods(clientsOut, foodManager);
+							serverListener.getSnake(snakesMap, out);
+							times = 0;
 							break;
 					}
 				}

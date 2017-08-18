@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -19,6 +20,7 @@ public class Snake  extends Layout implements Serializable{
 	private Skin skin;
 	private AffineTransform trans;
 	private Random r = new Random();
+	DecimalFormat df = new DecimalFormat("#.000");
 	
 	public Snake(){
 		this.isAlive = true;
@@ -42,7 +44,7 @@ public class Snake  extends Layout implements Serializable{
 		double hy = head.getY()+bodyWidth+Config.WINDOWS_TITLE_HEIGHT;//30为窗口的额外高度
 		double x1= x - hx;
 		double y1 = y - hy;
-		double a = Math.atan2(y1,x1)+1.5707963267948966;
+		double a = Double.valueOf(df.format(Math.atan2(y1,x1)+1.5707963267948966));
 		head.setAngle(a);
 	}
 	
@@ -51,8 +53,8 @@ public class Snake  extends Layout implements Serializable{
 			Node head = body.peekFirst();
 			Node tail = body.pollLast();
 			tail.copy(head);
-			tail.setX(head.getX()+Math.sin(head.getAngle()));
-			tail.setY(head.getY()-Math.cos(head.getAngle()));
+			tail.setX(Double.valueOf(df.format(head.getX()+Math.sin(head.getAngle()))));
+			tail.setY(Double.valueOf(df.format(head.getY()-Math.cos(head.getAngle()))));
 			body.addFirst(tail);
 			times--;
 		}

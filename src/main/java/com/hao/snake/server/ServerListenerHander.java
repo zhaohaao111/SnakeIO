@@ -107,5 +107,22 @@ public class ServerListenerHander implements ServerListener{
 		out.close();
 		out = null;
 	}
+
+	@Override
+	public void getHead(ConcurrentHashMap<Integer, Snake> snakesMap, PrintWriter out) {
+		JSONObject result = new JSONObject();
+		ConcurrentHashMap<Integer, Node> heads = new ConcurrentHashMap<Integer, Node>();
+		for (Entry<Integer, Snake> entry : snakesMap.entrySet()) {
+			Snake snake = entry.getValue();
+			Node snakeHead = snake.getBody().peekFirst();
+			heads.put(entry.getKey(), snakeHead);
+		}
+		result.put("type", MsgType.GET_HEADS);
+		result.put("heads", JSONObject.toJSONString(heads));
+		out.println(result.toJSONString());
+		out.flush();
+		result.clear();
+		result = null;
+	}
 	
 }
